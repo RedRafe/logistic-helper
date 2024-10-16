@@ -1,0 +1,13 @@
+{
+  "name": "logistic-helper",
+  "version": "2.0.3",
+  "title": "Logistic Helper",
+  "author": "RedRafe",
+  "source": "https://github.com/RedRafe/logistic-helper",
+  "homepage": "https://mods.factorio.com/mod/logistic-helper",
+  "dependencies": [
+    "base >= 2.0.0"
+  ],
+  "description": "Effortlessly streamline your Factorio logistics with Logistic Helper! Use an easy shortcut to drag over an area and automatically configure chest-inserter-assembler conditions based on recipes, making mall setup and logistics management a breeze across your entire factory.",
+  "factorio_version": "2.0"
+}
