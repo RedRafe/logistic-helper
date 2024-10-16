@@ -206,7 +206,7 @@ Event.add(defines.events.on_gui_value_changed, function(event)
   local slider_value = data.slider.slider_value
   data.text.text = tostring(slider_value)
   data.slider.tooltip = string.format(slider_value)
-  get_player_settings(event.player_index)[data.key] = value
+  get_player_settings(event.player_index)[data.key] = slider_value
 end)
 
 Event.add(defines.events.on_gui_text_changed, function(event)
