@@ -2,12 +2,16 @@
 
 Welcome to **Logistic Helper**, your essential tool for efficient logistics management in Factorio! This mod is designed to alleviate the time-consuming process of setting up logistic malls by allowing you to quickly configure multiple recipes and their related logistics with minimal effort.
 
+![area_selection](https://github.com/RedRafe/logistic-helper/blob/main/archive/overview_2.png?raw=true)
+
 ## Features
 
 - **Quick Setup**: Activate the tool with the shortcut **CTRL + L** (customizable via menu -> controls).
 - **Drag to Configure**: Use **left-click and drag** to select the area you want to configure. The mod automatically analyzes the selected assemblers and establishes the necessary connections between inputs, outputs, and inserters based on the recipes set in the assemblers.
 - **Flexible Thresholds**: Toggle between setting item counts or stack counts quickly using a user-friendly interface.
 - **Reverse Clearance**: Use **right mouse button + drag** to clear any circuit network conditions from the selected entities, restoring your area to a clean state for easy reorganization or optimization.
+
+![area_selection](https://github.com/RedRafe/logistic-helper/blob/main/archive/overview_1.png?raw=true)
 
 ## Supported Storage Solutions
 
