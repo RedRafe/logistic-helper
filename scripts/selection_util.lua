@@ -79,7 +79,6 @@ local function build_logistic_units(entities)
   for _, e in pairs(entities) do
     local e_type = (e.type ~= 'entity-ghost' and e.type) or e.ghost_type
     if e_type == 'assembling-machine' or e_type == 'furnace' then
-      local recipe, quality = e.get_recipe()
       machines[#machines + 1] = e
     elseif e_type == 'inserter' then
       inserters[#inserters + 1] = e
@@ -143,6 +142,13 @@ local function compute_group_conditions(group, player_settings)
     local proto = prototypes.recipe[recipe.name]
     if proto and proto.main_product and proto.main_product.type == 'item' then
       main_product = proto.main_product.name
+    elseif #recipe.products > 1 then
+      local idx = 1
+      while idx <= #recipe.products and not main_product do
+        if recipe.products[idx].type == 'item' then
+          main_product = recipe.products[idx].name
+        end
+      end
     end
   end
 
