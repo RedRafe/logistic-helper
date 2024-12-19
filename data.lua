@@ -10,6 +10,7 @@ local select_mode = function(color, cursor_box)
     entity_filter_mode = 'whitelist',
     entity_type_filters = {
       'assembling-machine',
+      'furnace',
       'inserter',
       'logistic-container',
     },

@@ -78,7 +78,7 @@ local function build_logistic_units(entities)
 
   for _, e in pairs(entities) do
     local e_type = (e.type ~= 'entity-ghost' and e.type) or e.ghost_type
-    if e_type == 'assembling-machine' then
+    if e_type == 'assembling-machine' or e_type == 'furnace' then
       local recipe, quality = e.get_recipe()
       machines[#machines + 1] = e
     elseif e_type == 'inserter' then
