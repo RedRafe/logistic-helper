@@ -171,9 +171,13 @@ local function compute_group_conditions(group, player_settings)
   for _, c in pairs(group.input_containers) do
     if c.prototype.logistic_mode == 'requester' or c.prototype.logistic_mode == 'buffer' then
       local lp = c.get_logistic_point(defines.logistic_member_index.logistic_container)
+      lp.trash_not_requested = player_settings.trash_not_requested
       local section = lp.add_section()
       for slot_index, r in pairs(requests) do
         section.set_slot(slot_index, { value = { type = 'item', name = r.name, quality = quality, comparator = '=' }, min = r.count })
+      end
+      if c.prototype.logistic_mode == 'requester' then
+        c.request_from_buffers = player_settings.request_from_buffers
       end
     end
   end
@@ -193,6 +197,7 @@ local function compute_group_conditions(group, player_settings)
       c.storage_filter = { name = main_product, type = 'item', quality = quality }
     elseif c.prototype.logistic_mode == 'buffer' then
       local lp = c.get_logistic_point(defines.logistic_member_index.logistic_container)
+      lp.trash_not_requested = player_settings.trash_not_requested
       local section = lp.add_section()
       section.set_slot(1, { value = { type = 'item', name = main_product, quality = quality, comparator = '=' }, min = 1e7 })
     end

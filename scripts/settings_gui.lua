@@ -7,6 +7,8 @@ local close_button_name = Gui.uid_name()
 local radio_button_name = Gui.uid_name()
 local text_tag_name = Gui.uid_name()
 local slider_tag_name = Gui.uid_name()
+local trash_not_requested_name = Gui.uid_name()
+local request_from_buffers_name = Gui.uid_name()
 
 local Public = {}
 
@@ -17,6 +19,8 @@ local function get_player_settings(player_index)
       active = 'items',
       items = 200,
       stacks = 4,
+      trash_not_requested = false,
+      request_from_buffers = true,
     }
     storage.settings[player_index] = p_settings
   end
@@ -140,6 +144,33 @@ Public.get_main_frame = function(player)
     minimum_value = 0, maximum_value = 48, value_step = 5,
     radio_buttons = radio_buttons,
   })
+  canvas.add { type = 'line', direction = 'horizontal' }
+  do -- Trash unrequested
+    local flow = canvas.add { type = 'flow', direction = 'horizontal' }
+    flow.add {
+      type = 'checkbox',
+      name = trash_not_requested_name,
+      state = p_settings.trash_not_requested,
+    }
+    flow.add {
+      type = 'label',
+      caption = {'trash-not-requested-items'},
+      tooltip = {'trash-not-requested-items-tooltip'},
+    }
+  end
+    do -- Request from buffers
+    local flow = canvas.add { type = 'flow', direction = 'horizontal' }
+    flow.add {
+      type = 'checkbox',
+      name = request_from_buffers_name,
+      state = p_settings.request_from_buffers,
+    }
+    flow.add {
+      type = 'label',
+      caption = {'gui-logistic.request-from-buffer-chests'},
+    }
+  end
+  
 
   frame.auto_center = true
   return frame
@@ -189,6 +220,14 @@ Gui.on_checked_state_changed(radio_button_name, function(event)
   end
   element.state = true
   get_player_settings(event.player_index).active = data.key
+end)
+
+Gui.on_checked_state_changed(trash_not_requested_name, function(event)
+  get_player_settings(event.player_index).trash_not_requested = event.element.state
+end)
+
+Gui.on_checked_state_changed(request_from_buffers_name, function(event)
+  get_player_settings(event.player_index).request_from_buffers = event.element.state
 end)
 
 Event.add(defines.events.on_gui_value_changed, function(event)
