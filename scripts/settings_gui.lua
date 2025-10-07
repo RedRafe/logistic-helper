@@ -9,6 +9,9 @@ local text_tag_name = Gui.uid_name()
 local slider_tag_name = Gui.uid_name()
 local trash_not_requested_name = Gui.uid_name()
 local request_from_buffers_name = Gui.uid_name()
+local clear_assembler_circuits_name = Gui.uid_name()
+local clear_inserter_circuits_name = Gui.uid_name()
+local toggle_section_visibility_name = Gui.uid_name()
 
 local Public = {}
 
@@ -21,6 +24,8 @@ local function get_player_settings(player_index)
       stacks = 4,
       trash_not_requested = false,
       request_from_buffers = true,
+      clear_assembler_circuits = true,
+      clear_inserter_circuits = true,
     }
     storage.settings[player_index] = p_settings
   end
@@ -61,6 +66,54 @@ local function make_setting(parent, params)
   Gui.set_data(slider, data)
 end
 
+local function make_section(parent, params)
+  local data = {}
+  local frame = parent.add { type = 'frame', direction = 'vertical', style = 'deep_frame_in_shallow_frame_for_description' }
+  local label = frame.add{
+    type = 'label',
+    name = toggle_section_visibility_name,
+    caption = '▾ '..params.title,
+    style = 'semibold_label', --'tooltip_heading_label_category',
+    tags = { caption = params.title}
+  }
+  Gui.set_style(label, { font_color = { 200, 200, 200 }})
+  Gui.set_data(label, data)
+
+  if params.subtitle then
+    frame.add{
+      type = 'label',
+      caption = params.subtitle,
+    }
+  end
+
+  data.flow = frame.add { type = 'flow', direction = 'vertical' }
+  data.flow.add { type = 'line', direction = 'horizontal', style = 'tooltip_category_line' }
+  
+  if params.options then
+    for _, option in pairs(params.options) do
+      local flow = data.flow.add { type = 'flow', direction = 'horizontal' }
+      for _, element in pairs(option) do
+        flow.add(element)
+      end
+    end
+  end
+
+  return frame
+end
+
+Public.close = function(player)
+  local frame = player.gui.screen[main_frame_name]
+  if frame and frame.valid then
+    if player.opened == frame then
+      player.opened = nil
+    end
+    Gui.destroy(frame)
+    storage.pin[player.index] = nil
+    return true
+  end
+  return false
+end
+
 Public.get_main_frame = function(player)
   local frame = player.gui.screen[main_frame_name]
   if frame and frame.valid then
@@ -80,6 +133,7 @@ Public.get_main_frame = function(player)
     horizontally_stretchable = true,
     vertically_stretchable = true,
     maximal_height = 600,
+    natural_width = 250
   })
   Gui.set_data(frame, data)
 
@@ -144,33 +198,42 @@ Public.get_main_frame = function(player)
     minimum_value = 0, maximum_value = 48, value_step = 5,
     radio_buttons = radio_buttons,
   })
-  canvas.add { type = 'line', direction = 'horizontal' }
-  do -- Trash unrequested
-    local flow = canvas.add { type = 'flow', direction = 'horizontal' }
-    flow.add {
-      type = 'checkbox',
-      name = trash_not_requested_name,
-      state = p_settings.trash_not_requested,
+  -- Options
+  make_section(canvas, {
+    title = 'Assemblers',
+    options = {
+      {
+        -- Clear assembler connections
+        { type = 'checkbox', name = clear_assembler_circuits_name, state = p_settings.clear_assembler_circuits },
+        { type = 'label', caption = 'Clear assemblers', tooltip = {'gui.clear-entity-info-tooltip'} }
+      }
     }
-    flow.add {
-      type = 'label',
-      caption = {'trash-not-requested-items'},
-      tooltip = {'trash-not-requested-items-tooltip'},
+  })
+  make_section(canvas, {
+    title = 'Inserters',
+    options = {
+      {
+        -- Clear inserter connections
+        { type = 'checkbox', name = clear_inserter_circuits_name, state = p_settings.clear_inserter_circuits },
+        { type = 'label', caption = 'Clear inserters', tooltip = {'gui.clear-entity-info-tooltip'} }
+      }
     }
-  end
-    do -- Request from buffers
-    local flow = canvas.add { type = 'flow', direction = 'horizontal' }
-    flow.add {
-      type = 'checkbox',
-      name = request_from_buffers_name,
-      state = p_settings.request_from_buffers,
+  })
+  make_section(canvas, {
+    title = 'Containers',
+    options = {
+      {
+        -- Trash unrequested
+        { type = 'checkbox', name = trash_not_requested_name, state = p_settings.trash_not_requested },
+        { type = 'label', caption = {'trash-not-requested-items'}, tooltip = {'trash-not-requested-items-tooltip'} }
+      },
+      {
+        -- Request from buffers
+        { type = 'checkbox', name = request_from_buffers_name, state = p_settings.request_from_buffers },
+        { type = 'label', caption = {'gui-logistic.request-from-buffer-chests'} }
+      }
     }
-    flow.add {
-      type = 'label',
-      caption = {'gui-logistic.request-from-buffer-chests'},
-    }
-  end
-  
+  })
 
   frame.auto_center = true
   return frame
@@ -190,6 +253,18 @@ Public.toggle_main_frame = function(player)
     frame = Public.get_main_frame(player)
     player.opened = frame
     frame.visible = true
+  end
+end
+
+Public.update = function(player)
+  if Public.close(player) then
+    Public.toggle_main_frame(player)
+  end
+end
+
+Public.update_all = function()
+  for _, player in pairs(game.players) do
+    Public.update(player)
   end
 end
 
@@ -228,6 +303,21 @@ end)
 
 Gui.on_checked_state_changed(request_from_buffers_name, function(event)
   get_player_settings(event.player_index).request_from_buffers = event.element.state
+end)
+
+Gui.on_checked_state_changed(clear_assembler_circuits_name, function(event)
+  get_player_settings(event.player_index).clear_assembler_circuits = event.element.state
+end)
+
+Gui.on_checked_state_changed(clear_inserter_circuits_name, function(event)
+  get_player_settings(event.player_index).clear_inserter_circuits = event.element.state
+end)
+
+Gui.on_click(toggle_section_visibility_name, function(event)
+  local element = event.element
+  local flow = Gui.get_data(element).flow
+  flow.visible = not flow.visible
+  element.caption = (flow.visible and '▾ ' or '▴ ') .. element.tags.caption
 end)
 
 Event.add(defines.events.on_gui_value_changed, function(event)

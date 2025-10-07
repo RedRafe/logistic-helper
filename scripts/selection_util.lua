@@ -9,35 +9,41 @@ local Public = {}
 --- @field input_containers
 --- @field output_containers
 
-local function clear_inserter(entity)
+local function clear_inserter(entity, player_settings)
+  local clear = player_settings and player_settings.clear_assembler_circuits or false
   local cb = entity.get_or_create_control_behavior()
-  cb.circuit_condition = nil
-  cb.circuit_enable_disable = false
-  cb.circuit_hand_read_mode = defines.control_behavior.inserter.hand_read_mode.hold
-  cb.circuit_read_hand_contents = false
-  cb.circuit_set_filters = false
-  cb.circuit_set_stack_size = false
-  cb.circuit_stack_control_signal = nil
-  cb.connect_to_logistic_network = false
-  cb.logistic_condition = nil
+  if clear then
+    cb.circuit_condition = nil
+    cb.circuit_enable_disable = false
+    cb.circuit_hand_read_mode = defines.control_behavior.inserter.hand_read_mode.hold
+    cb.circuit_read_hand_contents = false
+    cb.circuit_set_filters = false
+    cb.circuit_set_stack_size = false
+    cb.circuit_stack_control_signal = nil
+    cb.connect_to_logistic_network = false
+    cb.logistic_condition = nil
+  end
 end
 
-local function clear_assembler(entity)
+local function clear_assembler(entity, player_settings)
+  local clear = player_settings and player_settings.clear_inserter_circuits or false
   local cb = entity.get_or_create_control_behavior()
-  cb.circuit_condition = nil
-  cb.circuit_enable_disable = false
-  cb.circuit_read_contents = false
-  cb.circuit_read_ingredients = false
-  cb.circuit_read_recipe_finished = false
-  cb.circuit_read_working = false
-  cb.circuit_recipe_finished_signal = nil
-  cb.circuit_set_recipe = false
-  cb.circuit_working_signal = nil
-  cb.connect_to_logistic_network = false
-  cb.logistic_condition = nil
+  if clear then
+    cb.circuit_condition = nil
+    cb.circuit_enable_disable = false
+    cb.circuit_read_contents = false
+    cb.circuit_read_ingredients = false
+    cb.circuit_read_recipe_finished = false
+    cb.circuit_read_working = false
+    cb.circuit_recipe_finished_signal = nil
+    cb.circuit_set_recipe = false
+    cb.circuit_working_signal = nil
+    cb.connect_to_logistic_network = false
+    cb.logistic_condition = nil
+  end
 end
 
-local function clear_container(entity)
+local function clear_container(entity, _)
   local mode = entity.prototype.logistic_mode
   if mode == 'storage' then
     entity.set_filter(1, nil)
@@ -53,14 +59,16 @@ local function clear_container(entity)
   end
 end
 
-local function clear_entity_info(entity)
+--- @param entity LuaEntity
+--- @param player_settings table
+local function clear_entity_info(entity, player_settings)
   local e_type = (entity.type ~= 'entity-ghost' and entity.type) or entity.ghost_type
   if e_type == 'assembling-machine' then
-    clear_assembler(entity)
+    clear_assembler(entity, player_settings)
   elseif e_type == 'inserter' then
-    clear_inserter(entity)
+    clear_inserter(entity, player_settings)
   elseif e_type == 'logistic-container' then
-    clear_container(entity)
+    clear_container(entity, player_settings)
   end
 end
 
@@ -212,7 +220,7 @@ Public.set_info = function(entities, player_settings)
     for _, subgroup in pairs(group) do
       if type(subgroup) == 'table' then
         for _, entity in pairs(subgroup) do
-          clear_entity_info(entity)
+          clear_entity_info(entity, player_settings)
         end
       end
     end
