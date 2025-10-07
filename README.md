@@ -27,4 +27,12 @@ Welcome to **Logistic Helper**, your essential tool for efficient logistics mana
 
 With "Logistic Helper," setting up your logistic malls has never been easier. Say goodbye to repetitive manual setup and enjoy seamless integration into your logistics systems. 
 
+## Options
+![options](https://github.com/RedRafe/logistic-helper/blob/main/archive/gui_v2.2.0.png?raw=true)
+
+1. **Assemblers*: clear connections
+1. **Inserters*: clear connections
+1. **Containers*: toggle trash unrequested items, toggle "request from buffer chests"
+
+
 Download now and optimize your Factorio experience with "Logistic Helper"! Get ready to revolutionize your logistic malls!
